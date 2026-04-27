@@ -1,6 +1,6 @@
 {
   "name": "@inferagraph/sql-datasource",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "SQL datasource for InferaGraph (PostgreSQL, MySQL, SQLite, MSSQL)",
   "repository": { "type": "git", "url": "git+https://github.com/inferagraph/sql-datasource.git" },
