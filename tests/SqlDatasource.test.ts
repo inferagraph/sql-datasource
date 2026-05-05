@@ -349,6 +349,96 @@ describe('SqlDatasource', () => {
       expect(result.nodes).toHaveLength(2);
       expect(result.edges).toHaveLength(1);
     });
+
+    it('should expand to depth 2 via BFS, returning 2-hop neighbors', async () => {
+      const nodeRows = [
+        { id: 'n1', name: 'Node 1', type: 'person' },
+        { id: 'n2', name: 'Node 2', type: 'person' },
+        { id: 'n3', name: 'Node 3', type: 'person' },
+      ];
+      const edgeRows = [
+        { id: 'e1', source_id: 'n1', target_id: 'n2', type: 'knows', weight: 1.0 },
+        { id: 'e2', source_id: 'n2', target_id: 'n3', type: 'knows', weight: 1.0 },
+      ];
+
+      mockKnexInstance = createMockKnex({
+        nodes: nodeRows,
+        edges: edgeRows,
+        node_properties: [],
+      });
+
+      const ds = new SqlDatasource({
+        dialect: 'postgres',
+        connection: 'postgres://localhost/test',
+      });
+      await ds.connect();
+
+      const result = await ds.getNeighbors('n1', 2);
+
+      // Level 0 from n1: e1 -> n2 added. Level 1 from n2: e2 -> n3 added.
+      // All three nodes must be present.
+      expect(result.nodes.map((n) => n.id).sort()).toEqual(['n1', 'n2', 'n3']);
+      // Both edges must be present.
+      expect(result.edges.map((e) => e.id).sort()).toEqual(['e1', 'e2']);
+    });
+
+    it('should dedupe edges and nodes across BFS levels', async () => {
+      // The mock returns the full edges array on every fetchEdgeRowsForNode
+      // call. With depth=3 starting at n1, BFS would re-encounter e1 and e2
+      // multiple times across levels — dedup must collapse them.
+      const nodeRows = [
+        { id: 'n1', name: 'Node 1', type: 'person' },
+        { id: 'n2', name: 'Node 2', type: 'person' },
+        { id: 'n3', name: 'Node 3', type: 'person' },
+      ];
+      const edgeRows = [
+        { id: 'e1', source_id: 'n1', target_id: 'n2', type: 'knows', weight: 1.0 },
+        { id: 'e2', source_id: 'n2', target_id: 'n3', type: 'knows', weight: 1.0 },
+      ];
+
+      mockKnexInstance = createMockKnex({
+        nodes: nodeRows,
+        edges: edgeRows,
+        node_properties: [],
+      });
+
+      const ds = new SqlDatasource({
+        dialect: 'postgres',
+        connection: 'postgres://localhost/test',
+      });
+      await ds.connect();
+
+      const result = await ds.getNeighbors('n1', 3);
+
+      // Each node and edge appears exactly once even though the BFS visits
+      // all of them more than once.
+      expect(result.nodes).toHaveLength(3);
+      expect(result.edges).toHaveLength(2);
+      expect(new Set(result.nodes.map((n) => n.id)).size).toBe(3);
+      expect(new Set(result.edges.map((e) => e.id)).size).toBe(2);
+    });
+
+    it('should terminate BFS early when no new neighbors are found', async () => {
+      // depth=5 but the graph contains a single isolated node with no edges.
+      // The frontier becomes empty after the first level and the loop must
+      // exit cleanly.
+      mockKnexInstance = createMockKnex({
+        nodes: [{ id: 'n1', name: 'Lonely', type: 'person' }],
+        edges: [],
+        node_properties: [],
+      });
+
+      const ds = new SqlDatasource({
+        dialect: 'postgres',
+        connection: 'postgres://localhost/test',
+      });
+      await ds.connect();
+
+      const result = await ds.getNeighbors('n1', 5);
+
+      expect(result.nodes.map((n) => n.id)).toEqual(['n1']);
+      expect(result.edges).toHaveLength(0);
+    });
   });
 
   // --- findPath ---

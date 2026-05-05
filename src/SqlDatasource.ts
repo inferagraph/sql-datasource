@@ -79,28 +79,54 @@ export class SqlDatasource extends Datasource {
     return this.rowToNodeData(row);
   }
 
-  async getNeighbors(nodeId: NodeId, _depth: number = 1): Promise<GraphData> {
+  async getNeighbors(nodeId: NodeId, depth: number = 1): Promise<GraphData> {
     this.ensureConnected();
 
-    // Get edges connected to this node
-    const edgeRows = await this.db!(this.tables.edges)
-      .where('source_id', nodeId)
-      .orWhere('target_id', nodeId);
+    // SQL has no native graph traversal, so depth>1 is implemented as
+    // application-level BFS mirroring the existing findPath pattern: iterate
+    // 1-hop fan-out from each newly discovered frontier node up to `depth`
+    // levels. Dedupe edges by id and nodes by id.
+    const effectiveDepth = Math.max(1, Math.floor(depth));
 
-    // Collect neighbor IDs
-    const neighborIds = new Set<string>();
-    neighborIds.add(nodeId);
-    for (const edge of edgeRows) {
-      neighborIds.add(edge.source_id);
-      neighborIds.add(edge.target_id);
+    const visitedNodeIds = new Set<string>([nodeId]);
+    const collectedEdgeRows = new Map<string, Record<string, unknown>>();
+    let frontier: string[] = [nodeId];
+
+    for (let level = 0; level < effectiveDepth && frontier.length > 0; level++) {
+      const nextFrontier: string[] = [];
+
+      for (const currentId of frontier) {
+        const edgeRows = await this.fetchEdgeRowsForNode(currentId);
+        for (const edge of edgeRows) {
+          const edgeId = String(edge.id);
+          if (!collectedEdgeRows.has(edgeId)) {
+            collectedEdgeRows.set(edgeId, edge);
+          }
+          const sourceId = String(edge.source_id);
+          const targetId = String(edge.target_id);
+          const otherId = sourceId === currentId ? targetId : sourceId;
+          if (!visitedNodeIds.has(otherId)) {
+            visitedNodeIds.add(otherId);
+            nextFrontier.push(otherId);
+          }
+        }
+      }
+
+      frontier = nextFrontier;
     }
 
-    // Fetch all nodes
-    const nodeRows = await this.db!(this.tables.nodes).whereIn('id', [...neighborIds]);
+    // Fetch all visited node rows in a single query
+    const nodeRows = await this.db!(this.tables.nodes).whereIn('id', [...visitedNodeIds]);
     const nodes = await Promise.all(nodeRows.map((row) => this.rowToNodeData(row)));
-    const edges = edgeRows.map((row) => this.rowToEdgeData(row));
+    const edges = [...collectedEdgeRows.values()].map((row) => this.rowToEdgeData(row));
 
     return { nodes, edges };
+  }
+
+  private async fetchEdgeRowsForNode(nodeId: NodeId): Promise<Record<string, unknown>[]> {
+    return this.db!(this.tables.edges)
+      .where('source_id', nodeId)
+      .orWhere('target_id', nodeId);
   }
 
   async findPath(fromId: NodeId, toId: NodeId): Promise<GraphData> {
