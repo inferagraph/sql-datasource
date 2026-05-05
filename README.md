@@ -45,11 +45,15 @@ await datasource.connect();
 
 const view = await datasource.getInitialView();
 const node = await datasource.getNode('node-1');
-const neighbors = await datasource.getNeighbors('node-1');
+const neighbors = await datasource.getNeighbors('node-1', 2); // depth>1 supported
 const results = await datasource.search('keyword');
 
 await datasource.disconnect();
 ```
+
+### Multi-hop neighbors
+
+`getNeighbors(nodeId, depth)` supports `depth > 1`. SQL has no native graph traversal, so the datasource does an application-level BFS — one 1-hop fan-out per level, deduping nodes and edges by id. Single-hop callers see no change.
 
 ## Configuration
 
