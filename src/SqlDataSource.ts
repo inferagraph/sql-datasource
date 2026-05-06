@@ -10,16 +10,16 @@ import type {
   DataFilter,
 } from '@inferagraph/core';
 import knex, { type Knex } from 'knex';
-import type { SqlDatasourceConfig, TableNames } from './types.js';
+import type { SqlDataSourceConfig, TableNames } from './types.js';
 import { createSchema } from './schema.js';
 
-export class SqlDatasource extends Datasource {
+export class SqlDataSource extends Datasource {
   readonly name = 'sql';
   private db: Knex | null = null;
-  private config: SqlDatasourceConfig;
+  private config: SqlDataSourceConfig;
   private tables: TableNames;
 
-  constructor(config: SqlDatasourceConfig) {
+  constructor(config: SqlDataSourceConfig) {
     super();
     this.config = config;
     this.tables = {
@@ -266,7 +266,7 @@ export class SqlDatasource extends Datasource {
 
   private ensureConnected(): void {
     if (!this.db) {
-      throw new Error('SqlDatasource is not connected. Call connect() first.');
+      throw new Error('SqlDataSource is not connected. Call connect() first.');
     }
   }
 
@@ -334,3 +334,17 @@ export class SqlDatasource extends Datasource {
     return { items: sliced, total, hasMore: offset + limit < total };
   }
 }
+
+/**
+ * Factory for {@link SqlDataSource}. The recommended public entry point —
+ * matches the `@inferagraph/*` ecosystem convention of factory functions
+ * over class construction. The constructor stays as an escape hatch for
+ * advanced subclassing.
+ *
+ * The factory does not call {@link SqlDataSource.connect}; callers connect
+ * explicitly so they control when the underlying knex pool spins up.
+ */
+export function sqlDataSource(config: SqlDataSourceConfig): SqlDataSource {
+  return new SqlDataSource(config);
+}
+

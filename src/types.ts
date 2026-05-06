@@ -1,4 +1,4 @@
-export interface SqlDatasourceConfig {
+export interface SqlDataSourceConfig {
   connection: string | Record<string, unknown>; // Knex connection config
   dialect: 'postgres' | 'mysql' | 'sqlite' | 'mssql';
   tables?: {

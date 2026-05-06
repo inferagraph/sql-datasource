@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Knex } from 'knex';
-import { SqlDatasource } from '../src/SqlDatasource.js';
+import { SqlDataSource } from '../src/SqlDataSource.js';
 import { createSchema } from '../src/schema.js';
 
 // --- Mock knex ---
@@ -113,12 +113,12 @@ vi.mock('@inferagraph/core', () => {
   };
 });
 
-describe('SqlDatasource', () => {
-  let datasource: SqlDatasource;
+describe('SqlDataSource', () => {
+  let datasource: SqlDataSource;
 
   beforeEach(() => {
     mockKnexInstance = createMockKnex();
-    datasource = new SqlDatasource({
+    datasource = new SqlDataSource({
       dialect: 'postgres',
       connection: 'postgres://localhost/test',
     });
@@ -168,7 +168,7 @@ describe('SqlDatasource', () => {
 
   describe('connect with autoMigrate', () => {
     it('should call createSchema when autoMigrate is true', async () => {
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'sqlite',
         connection: ':memory:',
         autoMigrate: true,
@@ -196,43 +196,43 @@ describe('SqlDatasource', () => {
   describe('ensureConnected', () => {
     it('should throw when calling getInitialView before connect', async () => {
       await expect(datasource.getInitialView()).rejects.toThrow(
-        'SqlDatasource is not connected. Call connect() first.',
+        'SqlDataSource is not connected. Call connect() first.',
       );
     });
 
     it('should throw when calling getNode before connect', async () => {
       await expect(datasource.getNode('1')).rejects.toThrow(
-        'SqlDatasource is not connected',
+        'SqlDataSource is not connected',
       );
     });
 
     it('should throw when calling getNeighbors before connect', async () => {
       await expect(datasource.getNeighbors('1')).rejects.toThrow(
-        'SqlDatasource is not connected',
+        'SqlDataSource is not connected',
       );
     });
 
     it('should throw when calling findPath before connect', async () => {
       await expect(datasource.findPath('1', '2')).rejects.toThrow(
-        'SqlDatasource is not connected',
+        'SqlDataSource is not connected',
       );
     });
 
     it('should throw when calling search before connect', async () => {
       await expect(datasource.search('test')).rejects.toThrow(
-        'SqlDatasource is not connected',
+        'SqlDataSource is not connected',
       );
     });
 
     it('should throw when calling filter before connect', async () => {
       await expect(datasource.filter({})).rejects.toThrow(
-        'SqlDatasource is not connected',
+        'SqlDataSource is not connected',
       );
     });
 
     it('should throw when calling getContent before connect', async () => {
       await expect(datasource.getContent('1')).rejects.toThrow(
-        'SqlDatasource is not connected',
+        'SqlDataSource is not connected',
       );
     });
   });
@@ -255,7 +255,7 @@ describe('SqlDatasource', () => {
         node_properties: [],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -273,7 +273,7 @@ describe('SqlDatasource', () => {
     it('should return empty graph when no nodes exist', async () => {
       mockKnexInstance = createMockKnex({ nodes: [] });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -294,7 +294,7 @@ describe('SqlDatasource', () => {
         node_properties: [{ node_id: 'n1', key: 'era', value: 'ancient', value_type: 'string' }],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -310,7 +310,7 @@ describe('SqlDatasource', () => {
     it('should return undefined for missing node', async () => {
       mockKnexInstance = createMockKnex({ nodes: [] });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -339,7 +339,7 @@ describe('SqlDatasource', () => {
         node_properties: [],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -367,7 +367,7 @@ describe('SqlDatasource', () => {
         node_properties: [],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -402,7 +402,7 @@ describe('SqlDatasource', () => {
         node_properties: [],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -428,7 +428,7 @@ describe('SqlDatasource', () => {
         node_properties: [],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -447,7 +447,7 @@ describe('SqlDatasource', () => {
     it('should return empty graph when no path exists', async () => {
       mockKnexInstance = createMockKnex({ edges: [] });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -468,7 +468,7 @@ describe('SqlDatasource', () => {
         node_properties: [],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -489,7 +489,7 @@ describe('SqlDatasource', () => {
 
       mockKnexInstance = createMockKnex({ nodes, node_properties: [] });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -510,7 +510,7 @@ describe('SqlDatasource', () => {
 
       mockKnexInstance = createMockKnex({ nodes, node_properties: [] });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -532,7 +532,7 @@ describe('SqlDatasource', () => {
         node_properties: [],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -548,7 +548,7 @@ describe('SqlDatasource', () => {
         node_properties: [],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -564,7 +564,7 @@ describe('SqlDatasource', () => {
         node_properties: [],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -580,7 +580,7 @@ describe('SqlDatasource', () => {
         node_properties: [],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -596,7 +596,7 @@ describe('SqlDatasource', () => {
         node_properties: [],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -615,7 +615,7 @@ describe('SqlDatasource', () => {
 
       mockKnexInstance = createMockKnex({ nodes, node_properties: [] });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -643,7 +643,7 @@ describe('SqlDatasource', () => {
         ],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -660,7 +660,7 @@ describe('SqlDatasource', () => {
     it('should return undefined for missing content', async () => {
       mockKnexInstance = createMockKnex({ content: [] });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -682,7 +682,7 @@ describe('SqlDatasource', () => {
         ],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -705,7 +705,7 @@ describe('SqlDatasource', () => {
         ],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -720,7 +720,7 @@ describe('SqlDatasource', () => {
 
   describe('custom table names', () => {
     it('should use custom table names', () => {
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
         tables: {
@@ -737,7 +737,7 @@ describe('SqlDatasource', () => {
     });
 
     it('should use custom table names during autoMigrate', async () => {
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'sqlite',
         connection: ':memory:',
         tables: {
@@ -759,7 +759,7 @@ describe('SqlDatasource', () => {
     });
 
     it('should default table names when not provided', () => {
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -782,7 +782,7 @@ describe('SqlDatasource', () => {
         ],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -810,7 +810,7 @@ describe('SqlDatasource', () => {
         ],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -836,7 +836,7 @@ describe('SqlDatasource', () => {
         node_properties: [],
       });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -863,7 +863,7 @@ describe('SqlDatasource', () => {
 
       mockKnexInstance = createMockKnex({ nodes, node_properties: [] });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
@@ -878,7 +878,7 @@ describe('SqlDatasource', () => {
     it('should handle empty pagination result', async () => {
       mockKnexInstance = createMockKnex({ nodes: [], node_properties: [] });
 
-      const ds = new SqlDatasource({
+      const ds = new SqlDataSource({
         dialect: 'postgres',
         connection: 'postgres://localhost/test',
       });
