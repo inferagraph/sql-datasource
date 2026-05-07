@@ -30,7 +30,7 @@ vi.mock('knex', () => ({
 }));
 
 vi.mock('@inferagraph/core', () => ({
-  Datasource: class {},
+  DataSource: class {},
 }));
 
 describe('provisionSqlSchemas', () => {

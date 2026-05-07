@@ -1,4 +1,4 @@
-import { Datasource } from '@inferagraph/core';
+import { DataSource } from '@inferagraph/core';
 import type {
   DataAdapterConfig,
   GraphData,
@@ -13,7 +13,7 @@ import knex, { type Knex } from 'knex';
 import type { SqlDataSourceConfig, TableNames } from './types.js';
 import { createSchema } from './schema.js';
 
-export class SqlDataSource extends Datasource {
+export class SqlDataSource extends DataSource {
   readonly name = 'sql';
   private db: Knex | null = null;
   private config: SqlDataSourceConfig;
