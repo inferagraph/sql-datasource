@@ -103,7 +103,7 @@ vi.mock('knex', () => {
 });
 
 // Mock @inferagraph/core to provide the DataSource base class
-vi.mock('@inferagraph/core', () => {
+vi.mock('@inferagraph/core/data', () => {
   return {
     DataSource: class {
       constructor() {

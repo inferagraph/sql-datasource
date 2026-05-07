@@ -1,5 +1,5 @@
 import knexFactory, { type Knex } from 'knex';
-import type { CacheProvider } from '@inferagraph/core';
+import type { CacheProvider } from '@inferagraph/core/data';
 import type { SqlDataSourceConfig } from './types.js';
 
 /**

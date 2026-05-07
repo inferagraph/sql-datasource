@@ -2,7 +2,7 @@ import knexFactory, { type Knex } from 'knex';
 import type {
   ConversationStore,
   ConversationTurn,
-} from '@inferagraph/core';
+} from '@inferagraph/core/data';
 import type { SqlDataSourceConfig } from './types.js';
 
 /**

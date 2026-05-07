@@ -1,6 +1,6 @@
 {
   "name": "@inferagraph/sql",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "description": "SQL datasource, vector embedding store, inferred-edge store, conversation store, and cache provider for InferaGraph (PostgreSQL with pgvector for vector stores; PostgreSQL/MySQL/SQLite/MSSQL for the rest)",
   "repository": {

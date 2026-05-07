@@ -4,7 +4,7 @@ import {
   SqlVectorEmbeddingStore,
   sqlVectorEmbeddingStore,
 } from '../src/SqlVectorEmbeddingStore.js';
-import type { EmbeddingRecord } from '@inferagraph/core';
+import type { EmbeddingRecord } from '@inferagraph/core/data';
 
 // --- Capturing mock knex ---
 
@@ -32,7 +32,7 @@ vi.mock('knex', () => ({
   default: vi.fn(() => factoryMockKnex),
 }));
 
-vi.mock('@inferagraph/core', () => ({
+vi.mock('@inferagraph/core/data', () => ({
   DataSource: class {},
 }));
 

@@ -6,7 +6,7 @@ import type {
   SearchVectorHit,
   SimilarHit,
   Vector,
-} from '@inferagraph/core';
+} from '@inferagraph/core/data';
 import type { SqlDataSourceConfig } from './types.js';
 
 /**

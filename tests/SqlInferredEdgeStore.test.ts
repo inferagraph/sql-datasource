@@ -4,7 +4,7 @@ import {
   SqlInferredEdgeStore,
   sqlInferredEdgeStore,
 } from '../src/SqlInferredEdgeStore.js';
-import type { InferredEdge } from '@inferagraph/core';
+import type { InferredEdge } from '@inferagraph/core/data';
 
 interface CapturedCall {
   sql: string;
@@ -33,7 +33,7 @@ vi.mock('knex', () => ({
   default: vi.fn(() => factoryMockKnex),
 }));
 
-vi.mock('@inferagraph/core', () => ({
+vi.mock('@inferagraph/core/data', () => ({
   DataSource: class {},
 }));
 

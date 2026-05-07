@@ -32,7 +32,7 @@ vi.mock('knex', () => ({
   default: vi.fn(() => factoryMockKnex),
 }));
 
-vi.mock('@inferagraph/core', () => ({
+vi.mock('@inferagraph/core/data', () => ({
   DataSource: class {},
 }));
 
